@@ -4,7 +4,7 @@ SendToRemarkable scans an email inbox for unread emails containing PDFs and ePub
 ## Instructions
 1. Configure your email account to allow for basic authentication for IMAP. This may require an App Password if you have MFA enabled. Tested successfully with Gmail.
 2. Run the `rmapi` command from within this container, and enter the ReMarkable one-time code when prompted. Exit `rmapi`, then record the contents of `/root/.config/rmapi/rmapi.conf`. This will be mounted inside the container later. Alternatively, you could use a volume mount for this location if you don't mind the app becoming stateful.
-3. By default, cron runs every minute to check for new emails. Adjust this to your liking.
+3. By default, cron runs every minute to check for new emails. Adjust this to your liking in `crontab.txt`.
 
 
 ## Example Kubernetes deployment
