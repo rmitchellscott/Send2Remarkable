@@ -34,6 +34,6 @@ for (uid, message) in messages:
                 fp.write(attachment.get('content').read())
         except:
             print(traceback.print_exc())
-        subprocess.call(['sh','./putFiles.sh'])
+        subprocess.call(['sh','/putFiles.sh'])
         mail.mark_seen(uid)
 mail.logout()
