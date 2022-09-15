@@ -7,6 +7,7 @@ RUN git clone https://github.com/juruen/rmapi && \
 FROM python:alpine
 RUN pip install imbox
 COPY . .
+RUN chmod +x entry.sh
 COPY --from=rmapi-builder /go/bin/rmapi /usr/local/bin/rmapi
 RUN mkdir files
-ENTRYPOINT ["entry.sh"]
+ENTRYPOINT ["/entry.sh"]
