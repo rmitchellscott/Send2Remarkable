@@ -29,26 +29,43 @@ jobs:
           cache_registry: harbor.mitchellscott.us/library/cache
           extra_args: --cache-copy-layers
   build-ghcr:
+    name: Build Image
     runs-on: ubuntu-latest
-    name: Build docker image push to GHCR
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          submodules: true
-      - name: Get short SHA
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-      - name: Build and push to Harbor
-        uses: aevea/action-kaniko@master
+          images: |
+            ghcr.io/rmitchellscott/send2remarkable
+          tags: |
+            type=raw,priority=1000,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch
+            type=sha
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ secrets.HARBOR_USER }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          build_file: ./Dockerfile
-          image: send2remarkable
-          tag: ${{ steps.slug.outputs.sha8 }}
-          cache: true
-          cache_registry: cache
+      - name: Build and Push
+        id: docker_build
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          pull: true
+          push: ${{ github.ref == 'refs/heads/main' }}
+          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   # deploy:
   #   runs-on: ubuntu-latest

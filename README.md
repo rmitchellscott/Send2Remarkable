@@ -1,5 +1,5 @@
-# SendToRemarkable
-SendToRemarkable scans an email inbox for unread emails containing PDFs and ePubs and sends them to ReMarkable Cloud or [rmfakecloud](https://github.com/ddvk/rmfakecloud). Can be paired nicely with [Calibre-Web](https://github.com/janeczku/calibre-web) for sending eBooks from your Calibre library directly to your ReMarkable tablet. SendToRemarkable uses [rmapi](https://github.com/juruen/rmapi) under the hood to send the files.
+# Send2Remarkable
+Send2Remarkable scans an email inbox for unread emails containing PDFs and ePubs and sends them to ReMarkable Cloud or [rmfakecloud](https://github.com/ddvk/rmfakecloud). Can be paired nicely with [Calibre-Web](https://github.com/janeczku/calibre-web) for sending eBooks from your Calibre library directly to your ReMarkable tablet. Send2Remarkable uses [rmapi](https://github.com/juruen/rmapi) under the hood to send the files.
 
 ## Instructions
 1. Configure your email account to allow for basic authentication for IMAP. This may require an App Password if you have MFA enabled. Tested successfully with Gmail.
@@ -27,7 +27,7 @@ spec:
         app: send2remarkable
     spec:
       containers:
-      - image: harbor.mitchellscott.us/library/send2remarkable:33a62f03
+      - image: ghcr.io/rmitchellscott/send2remarkable:latest
         name: send2remarkable
         env:
         - name: IMAP_HOST
