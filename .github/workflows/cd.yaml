@@ -6,29 +6,29 @@ on: push
 #   YAMLPATH: blog-mitchell/blog.yaml
 
 jobs:
-  build-harbor:
-    runs-on: ubuntu-latest
-    name: Build docker image push to Harbor
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Get short SHA
-        id: slug
-        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-      - name: Build and push to Harbor
-        uses: aevea/action-kaniko@master
-        with:
-          registry: harbor.mitchellscott.us
-          username: ${{ secrets.HARBOR_USER }}
-          password: ${{ secrets.HARBOR_PASS }}
-          build_file: ./Dockerfile
-          image: library/send2remarkable
-          tag: ${{ steps.slug.outputs.sha8 }}
-          cache: false
-          cache_registry: harbor.mitchellscott.us/library/cache
-          extra_args: --cache-copy-layers
-  build-ghcr:
+  # build-harbor:
+  #   runs-on: ubuntu-latest
+  #   name: Build docker image push to Harbor
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+  #     - name: Get short SHA
+  #       id: slug
+  #       run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+  #     - name: Build and push to Harbor
+  #       uses: aevea/action-kaniko@master
+  #       with:
+  #         registry: harbor.mitchellscott.us
+  #         username: ${{ secrets.HARBOR_USER }}
+  #         password: ${{ secrets.HARBOR_PASS }}
+  #         build_file: ./Dockerfile
+  #         image: library/send2remarkable
+  #         tag: ${{ steps.slug.outputs.sha8 }}
+  #         cache: false
+  #         cache_registry: harbor.mitchellscott.us/library/cache
+  #         extra_args: --cache-copy-layers
+  build:
     name: Build Image
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +40,7 @@ jobs:
         with:
           images: |
             ghcr.io/rmitchellscott/send2remarkable
+            harbor.mitchellscott.us/library/send2remarkable
           tags: |
             type=raw,priority=1000,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=branch
@@ -54,6 +55,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Harbor Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: harbor.mitchellscott.us
+          username: ${{ secrets.HARBOR_USER }}
+          password: ${{ secrets.HARBOR_PASS }}
       - name: Build and Push
         id: docker_build
         uses: docker/build-push-action@v3
