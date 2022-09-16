@@ -16,6 +16,6 @@ FROM python:alpine
 RUN pip install imbox
 COPY --from=rmapi-builder /app/rmapi/rmapi /usr/local/bin/rmapi
 COPY . .
-RUN chmod +x entry.sh && chmod +x init.sh
+RUN chmod +x entry.sh && chmod +x init.sh && mv init.sh /usr/local/bin/init
 RUN mkdir files
-ENTRYPOINT ["/entry.sh"]
+CMD ["/entry.sh"]

@@ -3,11 +3,44 @@ Send2Remarkable scans an email inbox for unread emails containing PDFs and ePubs
 
 ## Instructions
 1. Configure your email account to allow for basic authentication for IMAP. This may require an App Password if you have MFA enabled. Tested successfully with Gmail.
-2. Run the `rmapi` command from within this container, and enter the ReMarkable one-time code when prompted. Exit `rmapi`, then record the contents of `/root/.config/rmapi/rmapi.conf`. This will be mounted inside the container later. Alternatively, you could use a volume mount for this location if you don't mind the app becoming stateful.
-3. By default, cron runs every minute to check for new emails. Adjust this to your liking in `crontab.txt`.
+1. Get your device and user token file (rmapi.conf) from the Remarkable cloud by running the following command and entering the one-time code: `docker run -it ghcr.io/rmitchellscott/send2remarkable init`
+1. Save the output as rmapi.conf, and this will get mounted into the container.
+1. By default, cron runs every minute to check for new emails. Adjust this to your liking in `crontab.txt`.
 
+# Examples
+The following examples are provided as a way to get started. Some adjustments may be required before production use, particularly regarding secret management.
+## Docker
+```shell
+docker run -d \
+-v ~/rmapi.conf:/root/.config/rmapi/rmapi.conf \
+-e IMAP_HOST=imap.gmail.com \
+-e IMAP_USER=AzureDiamond@example.com \
+-e IMAP_PASSWORD=hunter2 \
+-e SUBJECT="Sent to E-Reader" \
+ghcr.io/rmitchellscott/send2remarkable
+```
 
-## Example Kubernetes deployment
+## Docker Compse
+
+```yaml
+verion: 2.4
+
+services:
+  send2remarkable:
+    image: ghcr.io/rmitchellscott/send2remarkable
+    volumes:
+      - type: bind
+        source: ~/rmapi.conf
+        target: /root/.config/rmapi/rmapi.conf
+    environment:
+      IMAP_HOST: imap.gmail.com
+      IMAP_USER: AzureDiamond@example.com
+      IMAP_PASSWORD: hunter2
+      SUBJECT: Sent to E-Reader
+    restart: unless-stopped
+```
+
+## Kubernetes deployment
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -57,7 +90,7 @@ spec:
           secretName: rmapi-secret
 ```
 
-## Environment Variables
+# Environment Variables
 
 | Variable                 | Required? | Details | Example |
 |--------------------------|-----------|---------|---------|
