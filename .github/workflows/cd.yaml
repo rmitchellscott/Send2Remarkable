@@ -1,33 +1,7 @@
 name: cd
 on: push
 
-# env:
-#   DEPLOYMENT: blog
-#   YAMLPATH: blog-mitchell/blog.yaml
-
 jobs:
-  # build-harbor:
-  #   runs-on: ubuntu-latest
-  #   name: Build docker image push to Harbor
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         submodules: true
-  #     - name: Get short SHA
-  #       id: slug
-  #       run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-  #     - name: Build and push to Harbor
-  #       uses: aevea/action-kaniko@master
-  #       with:
-  #         registry: harbor.mitchellscott.us
-  #         username: ${{ secrets.HARBOR_USER }}
-  #         password: ${{ secrets.HARBOR_PASS }}
-  #         build_file: ./Dockerfile
-  #         image: library/send2remarkable
-  #         tag: ${{ steps.slug.outputs.sha8 }}
-  #         cache: false
-  #         cache_registry: harbor.mitchellscott.us/library/cache
-  #         extra_args: --cache-copy-layers
   build:
     name: Build Image
     runs-on: ubuntu-latest
@@ -40,7 +14,6 @@ jobs:
         with:
           images: |
             ghcr.io/rmitchellscott/send2remarkable
-            harbor.mitchellscott.us/library/send2remarkable
           tags: |
             type=raw,priority=1000,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=branch
@@ -55,12 +28,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Login to Harbor Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: harbor.mitchellscott.us
-          username: ${{ secrets.HARBOR_USER }}
-          password: ${{ secrets.HARBOR_PASS }}
       - name: Build and Push
         id: docker_build
         uses: docker/build-push-action@v3
@@ -73,27 +40,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   name: Deploy to flux
-  #   needs: build
-  #   steps:
-  #     - name: Check out Kubernetes repo
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: rmitchellscott/kubernetes-apps
-  #         token: ${{ secrets.PAT }}
-  #     - name: Get short SHA
-  #       id: slug
-  #       run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-  #     - name: Set up yq
-  #       uses: frenck/action-setup-yq@v1
-  #     - name: Replace the image tag
-  #       env:
-  #         TAG: ${{ steps.slug.outputs.sha8 }}
-  #       run: yq -i e '(select(.kind=="Deployment" and .metadata.name==env(DEPLOYMENT)) | .spec.template.spec.containers.[].image) |= split(":").0 + ":" + env(TAG)' $YAMLPATH
-  #     - name: Commit and push
-  #       uses: stefanzweifel/git-auto-commit-action@v4
-  #       with:
-  #         commit_message: Update image tag for ${{env.DEPLOYMENT}} to ${{ steps.slug.outputs.sha8 }}
