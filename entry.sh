@@ -1,5 +1,3 @@
 #!/bin/sh
-echo "Importing crontab..."
-/usr/bin/crontab crontab.txt 
-echo "Starting cron"
-/usr/sbin/crond -f -L /dev/null
+echo "Starting S3 + SQS processor for send2remarkable"
+python /processS3Messages.py

@@ -1,1 +1,0 @@
-* * * * * python /downloadAttachments.py 2>&1
