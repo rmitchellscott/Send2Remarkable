@@ -8,14 +8,15 @@ RUN case "$TARGETPLATFORM" in \
         'linux/arm64') export GOARCH=arm64 ;; \
         *) export GOARCH=amd64 ;; \
     esac && \
-    git clone https://github.com/juruen/rmapi && \
+    git clone https://github.com/ddvk/rmapi && \
     cd rmapi && \
     go build -ldflags='-w -s' .
 
 FROM python:alpine
-RUN pip install imbox
+# Install boto3 for AWS services instead of imbox
+RUN pip install boto3
 COPY --from=rmapi-builder /app/rmapi/rmapi /usr/local/bin/rmapi
 COPY . .
 RUN chmod +x entry.sh && chmod +x init.sh && mv init.sh /usr/local/bin/init
-RUN mkdir files
+RUN mkdir -p files
 CMD ["/entry.sh"]
