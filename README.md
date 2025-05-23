@@ -1,3 +1,6 @@
+# Deprecation Notice - 2025-05-23
+This project has been deprecated and functionality rolled into [Aviary](https://github.com/rmitchellscott/aviary) & its [SES integration](https://github.com/rmitchellscott/aviary-integation-ses).
+
 # Send2Remarkable
 Send2Remarkable monitors an AWS SQS queue for emails placed in an S3 bucket containing PDFs and ePubs and sends them to ReMarkable Cloud or [rmfakecloud](https://github.com/ddvk/rmfakecloud). Can be paired nicely with [Calibre-Web](https://github.com/janeczku/calibre-web) for sending eBooks from your Calibre library directly to your ReMarkable tablet. Send2Remarkable uses [rmapi](https://github.com/ddvk/rmapi) under the hood to send the files.
 
